@@ -17,7 +17,7 @@ public struct PipelineConfiguration: Sendable {
     public init(
         language: SubtitleLanguage,
         backupLanguage: SubtitleLanguage? = nil,
-        searchPolicy: SearchPolicy = .breakIfFound,
+        searchPolicy: SearchPolicy = .searchAll,
         downloadPolicy: DownloadPolicy = .showListIfNeeded,
         noBackup: Bool = false,
         postProcessing: PostProcessingSettings = PostProcessingSettings(),

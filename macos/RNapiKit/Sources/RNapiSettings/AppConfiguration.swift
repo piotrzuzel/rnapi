@@ -42,7 +42,7 @@ public struct AppConfiguration: Sendable, Codable, Hashable {
     public init(
         languageCode: String = "pl",
         backupLanguageCode: String? = "en",
-        searchPolicy: SearchPolicy = .breakIfFound,
+        searchPolicy: SearchPolicy = .searchAll,
         downloadPolicy: DownloadPolicy = .showListIfNeeded,
         noBackup: Bool = false,
         quietBatch: Bool = false,
