@@ -1,0 +1,44 @@
+{
+  "name": "plzmasdk",
+  "version": "1.6.1",
+  "description": "(Portable, Patched, Package, cross-P-latform) Lzma SDK, libplzma",
+  "author": "Oleh Kulykov <olehkulykov@gmail.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "keywords": [
+    "PLzmaSDK",
+    "lzma",
+    "7z",
+    "7zip",
+    "xz",
+    "tar",
+    "tar.xz",
+    "compression",
+    "decompression",
+    "password-protected"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "install": "node-gyp clean configure build --jobs 4 --release",
+    "dev_install": "node-gyp build --jobs 4 --release",
+    "test": "node node_tests/tests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OlehKulykov/PLzmaSDK.git"
+  },
+  "engines": {
+    "node": ">=13.0.0",
+    "npm": ">=6.0.0"
+  },
+  "devDependencies": {},
+  "gypfile": true,
+  "files": [
+    "node",
+    "node_tests",
+    "src",
+    "binding.gyp",
+    "index.js",
+    "libplzma.h",
+    "libplzma.hpp"
+  ]
+}

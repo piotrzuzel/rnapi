@@ -1,0 +1,28 @@
+# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
+
+name: Swift
+
+on:
+  push:
+    branches: [ "master", "dev", "tmp" ]
+    
+jobs:
+  build:
+    name: Swift
+    strategy:
+      matrix:
+        os: [macos-latest]
+        swift: ["6.1"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: swift-actions/setup-swift@v3
+        with:
+          swift-version: ${{ matrix.swift }}
+      - uses: actions/checkout@v5
+      - name: Get swift version
+        run: swift --version
+      - name: Build
+        run: swift build
+      - name: Run tests
+        run: swift test
+
