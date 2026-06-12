@@ -6,3 +6,7 @@ QNapi.xcodeproj/
 DerivedData/
 *.xcuserdatad/
 build/
+
+# Root .gitignore ignores the legacy "qnapi" binary name; this is a source dir
+!/QNapi/
+QNapi/Info.plist
