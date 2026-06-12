@@ -1,0 +1,65 @@
+name: QNapi
+options:
+  bundleIdPrefix: pl.qnapi
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+
+packages:
+  QNapiKit:
+    path: QNapiKit
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MACOSX_DEPLOYMENT_TARGET: "15.0"
+
+targets:
+  QNapi:
+    type: application
+    platform: macOS
+    sources:
+      - QNapi
+    dependencies:
+      - package: QNapiKit
+        product: QNapiUI
+    info:
+      path: QNapi/Info.plist
+      properties:
+        CFBundleName: QNapi
+        CFBundleDisplayName: QNapi
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        LSApplicationCategoryType: public.app-category.utilities
+        NSHumanReadableCopyright: "QNapi contributors, GPL-2.0"
+        LSMinimumSystemVersion: "15.0"
+        # NapiProjekt and Napisy24 are plain-HTTP services.
+        NSAppTransportSecurity:
+          NSExceptionDomains:
+            napiprojekt.pl:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
+            napisy24.pl:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
+        # "Open with QNapi" for video files.
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Video File
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - public.movie
+              - public.video
+              - public.mpeg-4
+              - com.apple.quicktime-movie
+              - public.avi
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pl.qnapi.QNapi
+        ENABLE_HARDENED_RUNTIME: YES
+        ENABLE_APP_SANDBOX: NO
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: "1.0.0"
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
