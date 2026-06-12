@@ -20,19 +20,32 @@ private func fake7zArchive(_ tail: String) -> Data {
     return data
 }
 
+/// Base64 of "1\n00:03:14,400 --> 00:03:20,400\nWitaj\n".
+private let napiSubtitleBase64 = "MQowMDowMzoxNCw0MDAgLS0+IDAwOjAzOjIwLDQwMApXaXRhago="
+
+private func napiSuccessXML(content: String) -> Data {
+    Data(
+        """
+        <?xml version="1.0"?>
+        <result><status>success</status><subtitles>\
+        <id>1864c7bdedbe7c28714025ff5a0d871a</id>\
+        <author>kat</author>\
+        <content><![CDATA[\(content)]]></content>\
+        </subtitles></result>
+        """.utf8)
+}
+
 @Suite(.serialized) struct NapiProjektEngineTests {
-    @Test func searchBuildsCorrectRequestAndReturnsResult() async throws {
-        MockURLProtocol.setHandler(hosts: ["www.napiprojekt.pl"]) { request in
-            let components = URLComponents(
-                url: request.url!, resolvingAgainstBaseURL: false)!
-            let query = Dictionary(
-                uniqueKeysWithValues: components.queryItems!.map { ($0.name, $0.value ?? "") })
-            #expect(components.host == "www.napiprojekt.pl")
-            #expect(query["l"] == "PL")
-            #expect(query["f"] == "1864c7bdedbe7c28714025ff5a0d871a")
-            #expect(query["t"] == "88805")
-            #expect(query["napios"] == "Mac OS X")
-            return (httpResponse(for: request), fake7zArchive("7z-archive-bytes"))
+    @Test func searchPostsApi3FormAndStashesDecodedSubtitle() async throws {
+        MockURLProtocol.setHandler(hosts: ["napiprojekt.pl"]) { request in
+            #expect(request.httpMethod == "POST")
+            #expect(request.url?.path() == "/api/api-napiprojekt3.php")
+            let body = String(decoding: requestBody(of: request), as: UTF8.self)
+            #expect(body.contains("mode=1"))
+            #expect(body.contains("downloaded_subtitles_id=1864c7bdedbe7c28714025ff5a0d871a"))
+            #expect(body.contains("downloaded_subtitles_lang=PL"))
+            #expect(body.contains("downloaded_subtitles_txt=1"))
+            return (httpResponse(for: request), napiSuccessXML(content: napiSubtitleBase64))
         }
 
         let engine = NapiProjektEngine(session: MockURLProtocol.makeSession())
@@ -41,9 +54,11 @@ private func fake7zArchive(_ tail: String) -> Data {
         #expect(results.count == 1)
         #expect(results[0].engineID == "NapiProjekt")
         #expect(results[0].title == "Some.Movie.2024")
-        // The handle points at the stashed archive.
-        let stashed = try Data(contentsOf: URL(fileURLWithPath: results[0].handle))
-        #expect(stashed == fake7zArchive("7z-archive-bytes"))
+        #expect(results[0].comment == "author: kat")
+        // The handle points at the stashed, already decoded subtitle text.
+        let stashed = try String(
+            contentsOf: URL(fileURLWithPath: results[0].handle), encoding: .utf8)
+        #expect(stashed == "1\n00:03:14,400 --> 00:03:20,400\nWitaj\n")
     }
 
     @Test func englishIsSpelledENG() {
@@ -51,9 +66,13 @@ private func fake7zArchive(_ tail: String) -> Data {
         #expect(NapiProjektEngine.languageParameter(polish) == "PL")
     }
 
-    @Test func npcMarkerMeansNoSubtitles() async throws {
-        MockURLProtocol.setHandler(hosts: ["www.napiprojekt.pl"]) { request in
-            (httpResponse(for: request), Data("NPc: no subtitles".utf8))
+    @Test func missResponseMeansNoSubtitles() async throws {
+        MockURLProtocol.setHandler(hosts: ["napiprojekt.pl"]) { request in
+            let xml = """
+                <?xml version="1.0"?>
+                <result><response_time>0.005 s.</response_time></result>
+                """
+            return (httpResponse(for: request), Data(xml.utf8))
         }
         let engine = NapiProjektEngine(session: MockURLProtocol.makeSession())
         let results = try await engine.search(file: movie, language: polish)
@@ -61,7 +80,7 @@ private func fake7zArchive(_ tail: String) -> Data {
     }
 
     @Test func htmlErrorPageMeansNoSubtitles() async throws {
-        MockURLProtocol.setHandler(hosts: ["www.napiprojekt.pl"]) { request in
+        MockURLProtocol.setHandler(hosts: ["napiprojekt.pl"]) { request in
             (httpResponse(for: request), Data("<html>service hiccup</html>".utf8))
         }
         let engine = NapiProjektEngine(session: MockURLProtocol.makeSession())
@@ -69,21 +88,23 @@ private func fake7zArchive(_ tail: String) -> Data {
         #expect(results.isEmpty)
     }
 
-    @Test func downloadExtractsWithHardcodedPassword() async throws {
-        let extractor = FakeArchiveExtractor(
-            fileNames: ["napisy.srt"], expectedPassword: "iBlm8NTigvru0Jr0")
-        let engine = NapiProjektEngine(
-            session: MockURLProtocol.makeSession(), extractor: extractor)
+    @Test func downloadCopiesStashedSubtitle() async throws {
+        let stash = FileManager.default.temporaryDirectory
+            .appendingPathComponent("rnapi-np-test-\(UUID().uuidString).txt")
+        try Data("subtitle text".utf8).write(to: stash)
+        defer { try? FileManager.default.removeItem(at: stash) }
+
+        let engine = NapiProjektEngine(session: MockURLProtocol.makeSession())
         let found = FoundSubtitle(
             engineID: "NapiProjekt", language: polish, title: "x",
-            formatExtension: "txt", resolution: .unknown, handle: "/tmp/fake.7z")
+            formatExtension: "txt", resolution: .unknown, handle: stash.path)
 
         let dir = FileManager.default.temporaryDirectory
             .appendingPathComponent("rnapi-test-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: dir) }
 
         let url = try await engine.download(found, to: dir)
-        #expect(url.lastPathComponent == "napisy.srt")
+        #expect(try String(contentsOf: url, encoding: .utf8) == "subtitle text")
     }
 }
 
