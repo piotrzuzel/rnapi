@@ -98,7 +98,11 @@ public struct SubtitleDownloadPipeline: Sendable {
         emit(.fileStarted(movie))
 
         emit(.hashing(movie))
-        guard let descriptor = try? MovieFileDescriptor.hashing(url: movie) else {
+        let descriptor: MovieFileDescriptor
+        do {
+            descriptor = try MovieFileDescriptor.hashing(url: movie)
+        } catch {
+            print("[SubtitleDownloadPipeline] hashing failed for \(movie.path): \(error)")
             emit(.fileFailed(movie, failure: .hashingFailed))
             return
         }
@@ -118,7 +122,15 @@ public struct SubtitleDownloadPipeline: Sendable {
         emit(.downloading(movie, subtitle: chosen))
         let workDirectory = configuration.temporaryDirectory
             .appendingPathComponent("rnapi-\(UUID().uuidString)")
-        defer { try? FileManager.default.removeItem(at: workDirectory) }
+        defer {
+            do {
+                if FileManager.default.fileExists(atPath: workDirectory.path) {
+                    try FileManager.default.removeItem(at: workDirectory)
+                }
+            } catch {
+                print("[SubtitleDownloadPipeline] failed to remove work directory \(workDirectory.path): \(error)")
+            }
+        }
 
         let downloaded: URL
         do {
@@ -173,8 +185,12 @@ public struct SubtitleDownloadPipeline: Sendable {
         func searchEngines(language: SubtitleLanguage, breakIfFound: Bool) async {
             for engine in engines {
                 emit(.searching(movie, engineID: engine.metadata.id, language: language))
-                let found = (try? await engine.search(file: descriptor, language: language)) ?? []
-                results.append(contentsOf: found)
+                do {
+                    let found = try await engine.search(file: descriptor, language: language)
+                    results.append(contentsOf: found)
+                } catch {
+                    print("[SubtitleDownloadPipeline] search failed engine=\(engine.metadata.id) language=\(language): \(error)")
+                }
                 if breakIfFound && !results.isEmpty { return }
             }
         }
