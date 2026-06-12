@@ -1,6 +1,6 @@
-# QNapi for macOS
+# RNapi for macOS
 
-Native macOS rewrite of QNapi in Swift 6 + SwiftUI. Menu bar app + CLI that
+RNapi — native macOS rewrite of [QNapi](https://github.com/QNapi/qnapi) in Swift 6 + SwiftUI. Menu bar app + CLI that
 download movie subtitles from NapiProjekt, OpenSubtitles (REST API) and
 Napisy24.
 
@@ -10,19 +10,19 @@ Requires macOS 15+, Xcode 26+, [xcodegen](https://github.com/yonaskolb/XcodeGen)
 
 ```
 macos/
-├── project.yml          # xcodegen manifest — QNapi.xcodeproj is generated
-├── QNapi/               # app shell: @main, AppDelegate, Info.plist
-├── QNapiKit/            # all logic, one SPM package with 9 targets
+├── project.yml          # xcodegen manifest — RNapi.xcodeproj is generated
+├── RNapi/               # app shell: @main, AppDelegate, Info.plist
+├── RNapiKit/            # all logic, one SPM package with 9 targets
 │   └── Sources/
-│       ├── QNapiCore/       # domain models, file hashes, languages, encodings
+│       ├── RNapiCore/       # domain models, file hashes, languages, encodings
 │       ├── SubtitleFormats/ # SRT/MicroDVD/MPL2/TMPlayer codecs + conversion
 │       ├── MediaInfo/       # frame-rate detection (AVFoundation)
 │       ├── SevenZip/        # 7z extraction (PLzmaSDK, AES support)
 │       ├── Engines/         # service clients behind SubtitleEngine protocol
 │       ├── DownloadPipeline/# orchestration: hash→search→select→download→match
-│       ├── QNapiSettings/   # UserDefaults config + Keychain credentials
-│       ├── QNapiUI/         # SwiftUI scenes and observable session models
-│       └── qnapi-cli/       # command-line interface
+│       ├── RNapiSettings/   # UserDefaults config + Keychain credentials
+│       ├── RNapiUI/         # SwiftUI scenes and observable session models
+│       └── rnapi-cli/       # command-line interface
 ├── Vendor/PLzmaSDK/     # vendored (SwiftPM forbids unsafe flags in remote deps)
 └── scripts/             # release build + notarization
 ```
@@ -30,25 +30,25 @@ macos/
 ## Build & test
 
 ```sh
-cd QNapiKit
+cd RNapiKit
 swift build          # everything except the .app
 swift test           # 70+ tests, no network needed
 
 cd ..
-xcodegen generate    # creates QNapi.xcodeproj (gitignored)
-xcodebuild -project QNapi.xcodeproj -scheme QNapi build
+xcodegen generate    # creates RNapi.xcodeproj (gitignored)
+xcodebuild -project RNapi.xcodeproj -scheme RNapi build
 ```
 
-CLI during development: `cd QNapiKit && swift run qnapi-cli -l pl Movie.mkv`
+CLI during development: `cd RNapiKit && swift run rnapi-cli -l pl Movie.mkv`
 
 ## Release
 
 ```sh
 CODE_SIGN_IDENTITY="Developer ID Application: ..." scripts/build-release.sh
-scripts/notarize.sh build/QNapi.app
+scripts/notarize.sh build/RNapi.app
 ```
 
-The CLI ships inside the bundle at `QNapi.app/Contents/Helpers/qnapi-cli`;
+The CLI ships inside the bundle at `RNapi.app/Contents/Helpers/rnapi-cli`;
 symlink it into your `PATH`.
 
 ## OpenSubtitles API key

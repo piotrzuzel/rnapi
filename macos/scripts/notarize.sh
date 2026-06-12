@@ -1,19 +1,19 @@
 #!/bin/bash
-# Notarizes a Developer ID-signed QNapi.app and staples the ticket.
+# Notarizes a Developer ID-signed RNapi.app and staples the ticket.
 #
 # Prerequisites:
 #   - App built with scripts/build-release.sh and CODE_SIGN_IDENTITY set to a
 #     "Developer ID Application" certificate.
 #   - One-time credential setup:
-#       xcrun notarytool store-credentials qnapi-notary \
+#       xcrun notarytool store-credentials rnapi-notary \
 #           --apple-id <apple-id> --team-id <team-id> --password <app-specific-pw>
 #
-# Usage: scripts/notarize.sh build/QNapi.app
+# Usage: scripts/notarize.sh build/RNapi.app
 set -euo pipefail
 
-APP="${1:?usage: notarize.sh path/to/QNapi.app}"
-PROFILE="${NOTARY_PROFILE:-qnapi-notary}"
-ZIP="$(mktemp -d)/QNapi.zip"
+APP="${1:?usage: notarize.sh path/to/RNapi.app}"
+PROFILE="${NOTARY_PROFILE:-rnapi-notary}"
+ZIP="$(mktemp -d)/RNapi.zip"
 
 echo "==> Zipping for submission"
 ditto -c -k --keepParent "$APP" "$ZIP"

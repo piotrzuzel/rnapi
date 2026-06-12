@@ -1,13 +1,13 @@
-name: QNapi
+name: RNapi
 options:
-  bundleIdPrefix: pl.qnapi
+  bundleIdPrefix: pl.rnapi
   deploymentTarget:
     macOS: "15.0"
   createIntermediateGroups: true
 
 packages:
-  QNapiKit:
-    path: QNapiKit
+  RNapiKit:
+    path: RNapiKit
 
 settings:
   base:
@@ -16,23 +16,23 @@ settings:
     MACOSX_DEPLOYMENT_TARGET: "15.0"
 
 targets:
-  QNapi:
+  RNapi:
     type: application
     platform: macOS
     sources:
-      - QNapi
+      - RNapi
     dependencies:
-      - package: QNapiKit
-        product: QNapiUI
+      - package: RNapiKit
+        product: RNapiUI
     info:
-      path: QNapi/Info.plist
+      path: RNapi/Info.plist
       properties:
-        CFBundleName: QNapi
-        CFBundleDisplayName: QNapi
+        CFBundleName: RNapi
+        CFBundleDisplayName: RNapi
         CFBundleShortVersionString: "1.0.0"
         CFBundleVersion: "1"
         LSApplicationCategoryType: public.app-category.utilities
-        NSHumanReadableCopyright: "QNapi contributors, GPL-2.0"
+        NSHumanReadableCopyright: "RNapi contributors, GPL-2.0"
         LSMinimumSystemVersion: "15.0"
         # NapiProjekt and Napisy24 are plain-HTTP services.
         NSAppTransportSecurity:
@@ -43,7 +43,7 @@ targets:
             napisy24.pl:
               NSExceptionAllowsInsecureHTTPLoads: true
               NSIncludesSubdomains: true
-        # "Open with QNapi" for video files.
+        # "Open with RNapi" for video files.
         CFBundleDocumentTypes:
           - CFBundleTypeName: Video File
             CFBundleTypeRole: Viewer
@@ -56,7 +56,7 @@ targets:
               - public.avi
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: pl.qnapi.QNapi
+        PRODUCT_BUNDLE_IDENTIFIER: pl.rnapi.RNapi
         ENABLE_HARDENED_RUNTIME: YES
         ENABLE_APP_SANDBOX: NO
         CURRENT_PROJECT_VERSION: 1
