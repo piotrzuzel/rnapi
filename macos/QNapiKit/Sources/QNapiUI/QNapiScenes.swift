@@ -29,6 +29,13 @@ public struct QNapiScenes: Scene {
         }
         .defaultSize(width: 560, height: 340)
 
+        Window("Scan Directories", id: WindowID.scan) {
+            ScanView()
+                .environment(settings)
+                .environment(session)
+        }
+        .defaultSize(width: 560, height: 460)
+
         Window("Convert Subtitles", id: WindowID.converter) {
             ConverterView()
         }
@@ -42,6 +49,7 @@ public struct QNapiScenes: Scene {
 
     public enum WindowID {
         public static let downloads = "downloads"
+        public static let scan = "scan"
         public static let converter = "converter"
     }
 }
@@ -58,8 +66,9 @@ private struct MenuBarContent: View {
             addMovies()
         }
 
-        Button("Scan Directory…") {
-            scanDirectory()
+        Button("Scan Directories…") {
+            openWindow(id: QNapiScenes.WindowID.scan)
+            NSApp.activate()
         }
 
         Button("Convert Subtitles…") {
@@ -111,27 +120,4 @@ private struct MenuBarContent: View {
         }
     }
 
-    private func scanDirectory() {
-        let panel = NSOpenPanel()
-        panel.canChooseFiles = false
-        panel.canChooseDirectories = true
-        panel.message = String(localized: "Choose a directory to scan for video files")
-        guard panel.runModal() == .OK, let directory = panel.url else { return }
-
-        openWindow(id: QNapiScenes.WindowID.downloads)
-        NSApp.activate()
-
-        let scanSettings = session.scanSettings
-        let session = self.session
-        Task.detached {
-            let movies = DirectoryScanner().scan(
-                directory: directory,
-                movieExtensions: scanSettings.filters,
-                skipIfSubtitlesExist: scanSettings.skipIfSubtitlesExist,
-                followSymlinks: scanSettings.followSymlinks)
-            await MainActor.run {
-                session.enqueue(movies)
-            }
-        }
-    }
 }

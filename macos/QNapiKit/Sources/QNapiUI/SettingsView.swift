@@ -72,6 +72,31 @@ private struct GeneralSettingsTab: View {
 
             Toggle("Back up existing subtitles", isOn: binding(\.noBackup, inverted: true))
             Toggle("Show Dock icon", isOn: binding(\.showDockIcon))
+
+            Divider()
+
+            Toggle(
+                "Change subtitle file permissions to:",
+                isOn: Binding(
+                    get: { configuration.changePermissionsTo != nil },
+                    set: { enabled in
+                        settings.update { $0.changePermissionsTo = enabled ? "644" : nil }
+                    }))
+            if configuration.changePermissionsTo != nil {
+                TextField(
+                    "Permissions (octal):",
+                    text: Binding(
+                        get: { configuration.changePermissionsTo ?? "644" },
+                        set: { newValue in
+                            let octal = newValue.filter("01234567".contains).prefix(3)
+                            settings.update { $0.changePermissionsTo = String(octal) }
+                        }))
+                .frame(width: 220)
+            }
+
+            Divider()
+
+            CommandLineToolRow()
         }
         .padding(20)
     }
@@ -88,6 +113,41 @@ private struct GeneralSettingsTab: View {
         Binding(
             get: { inverted != settings.configuration[keyPath: keyPath] },
             set: { newValue in settings.update { $0[keyPath: keyPath] = inverted != newValue } })
+    }
+}
+
+/// "Install command line tool" row: symlinks the bundled qnapi-cli into
+/// /usr/local/bin.
+private struct CommandLineToolRow: View {
+    @State private var status = CommandLineToolInstaller.status()
+    @State private var errorMessage: String?
+
+    var body: some View {
+        LabeledContent("Command line tool:") {
+            VStack(alignment: .leading, spacing: 4) {
+                switch status {
+                case .installed:
+                    Label("Installed at \(CommandLineToolInstaller.linkPath)",
+                          systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                        .font(.caption)
+                case .notInstalled:
+                    Button("Install Command Line Tool…") {
+                        errorMessage = CommandLineToolInstaller.install()
+                        status = CommandLineToolInstaller.status()
+                    }
+                case .bundledCLIMissing:
+                    Text("Available in release builds of QNapi.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                if let errorMessage {
+                    Text(errorMessage)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+            }
+        }
     }
 }
 
