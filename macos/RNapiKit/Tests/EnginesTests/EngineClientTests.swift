@@ -13,6 +13,13 @@ private let movie = MovieFileDescriptor(
 private let polish = SubtitleLanguage("pl")!
 private let english = SubtitleLanguage("en")!
 
+/// A payload that passes the engines' 7z-magic sanity check.
+private func fake7zArchive(_ tail: String) -> Data {
+    var data = Data([0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C])
+    data.append(Data(tail.utf8))
+    return data
+}
+
 @Suite(.serialized) struct NapiProjektEngineTests {
     @Test func searchBuildsCorrectRequestAndReturnsResult() async throws {
         MockURLProtocol.setHandler(hosts: ["www.napiprojekt.pl"]) { request in
@@ -25,7 +32,7 @@ private let english = SubtitleLanguage("en")!
             #expect(query["f"] == "1864c7bdedbe7c28714025ff5a0d871a")
             #expect(query["t"] == "88805")
             #expect(query["napios"] == "Mac OS X")
-            return (httpResponse(for: request), Data("7z-archive-bytes".utf8))
+            return (httpResponse(for: request), fake7zArchive("7z-archive-bytes"))
         }
 
         let engine = NapiProjektEngine(session: MockURLProtocol.makeSession())
@@ -36,7 +43,7 @@ private let english = SubtitleLanguage("en")!
         #expect(results[0].title == "Some.Movie.2024")
         // The handle points at the stashed archive.
         let stashed = try Data(contentsOf: URL(fileURLWithPath: results[0].handle))
-        #expect(stashed == Data("7z-archive-bytes".utf8))
+        #expect(stashed == fake7zArchive("7z-archive-bytes"))
     }
 
     @Test func englishIsSpelledENG() {
@@ -47,6 +54,15 @@ private let english = SubtitleLanguage("en")!
     @Test func npcMarkerMeansNoSubtitles() async throws {
         MockURLProtocol.setHandler(hosts: ["www.napiprojekt.pl"]) { request in
             (httpResponse(for: request), Data("NPc: no subtitles".utf8))
+        }
+        let engine = NapiProjektEngine(session: MockURLProtocol.makeSession())
+        let results = try await engine.search(file: movie, language: polish)
+        #expect(results.isEmpty)
+    }
+
+    @Test func htmlErrorPageMeansNoSubtitles() async throws {
+        MockURLProtocol.setHandler(hosts: ["www.napiprojekt.pl"]) { request in
+            (httpResponse(for: request), Data("<html>service hiccup</html>".utf8))
         }
         let engine = NapiProjektEngine(session: MockURLProtocol.makeSession())
         let results = try await engine.search(file: movie, language: polish)
@@ -91,7 +107,7 @@ private let english = SubtitleLanguage("en")!
             #expect(body.contains("fh=df1f5f9fe0234d40"))
             #expect(body.contains("fs=1234567"))
             var payload = Data("OK-2||".utf8)
-            payload.append(Data("archive-bytes".utf8))
+            payload.append(fake7zArchive("archive-bytes"))
             return (httpResponse(for: request), payload)
         }
 
@@ -100,7 +116,7 @@ private let english = SubtitleLanguage("en")!
 
         #expect(results.count == 1)
         let stashed = try Data(contentsOf: URL(fileURLWithPath: results[0].handle))
-        #expect(stashed == Data("archive-bytes".utf8))
+        #expect(stashed == fake7zArchive("archive-bytes"))
     }
 
     @Test func nonOKResponseMeansNoResults() async throws {

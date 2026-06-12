@@ -47,6 +47,13 @@ struct LiveEngineTests {
         #expect(results.isEmpty)
     }
 
+    @Test func openSubtitlesXmlRpcAnonymousLoginAnswersForBogusHash() async throws {
+        // Exercises the anonymous LogIn + SearchSubtitles round trip.
+        let engine = OpenSubtitlesXmlRpcEngine()
+        let results = try await engine.search(file: bogusMovie, language: polish)
+        #expect(results.isEmpty)
+    }
+
     @Test(.enabled(if: osApiKey != nil))
     func openSubtitlesSearchResponseDecodes() async throws {
         let engine = OpenSubtitlesEngine(
@@ -75,6 +82,20 @@ struct LiveEngineTests {
     func napisy24RoundTripDownloadsRealSubtitles() async throws {
         let descriptor = try liveDescriptor()
         let engine = Napisy24Engine()
+        let results = try await engine.search(file: descriptor, language: polish)
+        try #require(!results.isEmpty, "service has no subtitles for this movie")
+
+        let dir = downloadDirectory()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let subtitle = try await engine.download(results[0], to: dir)
+        let size = try FileManager.default.attributesOfItem(atPath: subtitle.path)[.size] as? Int
+        #expect((size ?? 0) > 0)
+    }
+
+    @Test(.enabled(if: liveMoviePath != nil))
+    func openSubtitlesXmlRpcRoundTripDownloadsRealSubtitles() async throws {
+        let descriptor = try liveDescriptor()
+        let engine = OpenSubtitlesXmlRpcEngine()
         let results = try await engine.search(file: descriptor, language: polish)
         try #require(!results.isEmpty, "service has no subtitles for this movie")
 

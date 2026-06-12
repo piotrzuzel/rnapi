@@ -60,8 +60,9 @@ public struct NapiProjektEngine: SubtitleEngine {
             throw EngineError.httpError(statusCode: http.statusCode)
         }
 
-        // "NPc" prefix is the service's "no subtitles" marker.
-        if data.prefix(3) == Data("NPc".utf8) {
+        // "NPc" prefix is the service's "no subtitles" marker; any other
+        // non-archive body (e.g. an HTML error page) means the same.
+        guard data.prefix(6) == sevenZipMagic else {
             return []
         }
 

@@ -11,8 +11,8 @@ public enum EngineFactory {
     ///   - order: engine IDs in user-configured priority order.
     ///   - enabled: subset of `order` that is active.
     ///   - credentials: per-engine user credentials (Keychain-backed).
-    ///   - openSubtitlesApiKey: required for the OpenSubtitles REST API;
-    ///     when nil/empty, that engine is skipped.
+    ///   - openSubtitlesApiKey: enables the OpenSubtitles REST API; when
+    ///     nil/empty, the legacy anonymous XML-RPC API is used instead.
     public static func makeEngines(
         order: [String],
         enabled: Set<String>,
@@ -29,7 +29,9 @@ public enum EngineFactory {
                 return Napisy24Engine(
                     credentials: credentials(id), temporaryDirectory: temporaryDirectory)
             case "OpenSubtitles":
-                guard let apiKey = openSubtitlesApiKey, !apiKey.isEmpty else { return nil }
+                guard let apiKey = openSubtitlesApiKey, !apiKey.isEmpty else {
+                    return OpenSubtitlesXmlRpcEngine(credentials: credentials(id))
+                }
                 return OpenSubtitlesEngine(
                     configuration: OpenSubtitlesConfiguration(
                         apiKey: apiKey, credentials: credentials(id)))

@@ -74,9 +74,14 @@ public struct Napisy24Engine: SubtitleEngine {
             return []
         }
 
+        let archiveData = data[separator.upperBound...]
+        guard archiveData.prefix(6) == sevenZipMagic else {
+            return []
+        }
+
         let archiveFile = temporaryDirectory
             .appendingPathComponent("rnapi-n24-\(UUID().uuidString).7z")
-        try data[separator.upperBound...].write(to: archiveFile)
+        try archiveData.write(to: archiveFile)
 
         return [
             FoundSubtitle(

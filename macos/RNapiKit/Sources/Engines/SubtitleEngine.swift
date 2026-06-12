@@ -48,6 +48,11 @@ public protocol SubtitleEngine: Sendable {
 /// Extensions recognized as subtitle files when picking from an archive.
 let subtitleFileExtensions: Set<String> = ["srt", "sub", "txt"]
 
+/// 7z archive magic bytes. The Polish services answer HTTP 200 with an HTML
+/// error page on hiccups; anything that is not a 7z archive must be treated
+/// as "no subtitles" (legacy validated this by extracting during search).
+let sevenZipMagic = Data([0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C])
+
 func firstSubtitleFile(in files: [URL]) throws -> URL {
     guard
         let subtitle = files.first(where: {
