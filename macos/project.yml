@@ -1,6 +1,6 @@
 name: RNapi
 options:
-  bundleIdPrefix: pl.rnapi
+  bundleIdPrefix: pl.xyn
   deploymentTarget:
     macOS: "15.0"
   createIntermediateGroups: true
@@ -56,7 +56,7 @@ targets:
               - public.avi
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: pl.rnapi.RNapi
+        PRODUCT_BUNDLE_IDENTIFIER: pl.xyn.rnapi
         ENABLE_HARDENED_RUNTIME: YES
         ENABLE_APP_SANDBOX: NO
         CURRENT_PROJECT_VERSION: 1

@@ -11,7 +11,7 @@ public protocol CredentialStore: Sendable {
 public struct KeychainCredentialStore: CredentialStore {
     private let servicePrefix: String
 
-    public init(servicePrefix: String = "pl.rnapi.engine") {
+    public init(servicePrefix: String = "pl.xyn.rnapi.engine") {
         self.servicePrefix = servicePrefix
     }
 

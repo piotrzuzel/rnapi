@@ -73,7 +73,7 @@ public struct AppConfiguration: Sendable, Codable, Hashable {
 /// UserDefaults-backed persistence for `AppConfiguration`.
 public struct SettingsStore: Sendable {
     /// Suite shared between the GUI app and the CLI.
-    public static let suiteName = "pl.rnapi.RNapi"
+    public static let suiteName = "pl.xyn.rnapi"
     private static let key = "appConfiguration"
 
     private let suiteName: String
