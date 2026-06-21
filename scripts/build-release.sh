@@ -13,9 +13,6 @@ OUTPUT_DIR="${1:-build}"
 IDENTITY="${CODE_SIGN_IDENTITY:--}"
 DERIVED_DATA="$OUTPUT_DIR/DerivedData"
 
-echo "==> Generating Xcode project"
-xcodegen generate
-
 echo "==> Building rnapi-cli (release)"
 (cd RNapiKit && swift build -c release --product rnapi-cli)
 CLI_BIN="RNapiKit/.build/release/rnapi-cli"
