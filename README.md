@@ -4,13 +4,13 @@ RNapi — native macOS rewrite of [QNapi](https://github.com/QNapi/qnapi) in
 Swift 6 + SwiftUI. A menu bar app and CLI that download movie subtitles from
 NapiProjekt, OpenSubtitles and Napisy24.
 
-Requires macOS 15+, Xcode 26+, [xcodegen](https://github.com/yonaskolb/XcodeGen).
+Requires macOS 15+, Xcode 26+.
 
 ## Layout
 
 ```
 .
-├── project.yml          # xcodegen manifest — RNapi.xcodeproj is generated
+├── RNapi.xcodeproj/     # Xcode project (tracked)
 ├── RNapi/               # app shell: @main, AppDelegate, Info.plist
 ├── RNapiKit/            # all logic, one SPM package with 9 targets
 │   └── Sources/
@@ -35,7 +35,6 @@ swift build          # everything except the .app
 swift test           # 70+ tests, no network needed
 
 cd ..                # repo root
-xcodegen generate    # creates RNapi.xcodeproj (gitignored)
 xcodebuild -project RNapi.xcodeproj -scheme RNapi build
 ```
 
