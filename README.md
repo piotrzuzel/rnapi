@@ -83,9 +83,3 @@ engines"); this is configurable in Settings.
   adapt if sandboxing is ever needed.
 - Plain-HTTP exceptions for napiprojekt.pl and napisy24.pl live in the app's
   Info.plist (`NSAppTransportSecurity`); both services are HTTP-only.
-
-## Legacy
-
-The original QNapi C++/Qt sources (`cli/`, `gui/`, `libqnapi/`, and related
-top-level directories) remain in the repository for reference only. They are
-not part of the RNapi build.
