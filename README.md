@@ -6,13 +6,10 @@ NapiProjekt, OpenSubtitles and Napisy24.
 
 Requires macOS 15+, Xcode 26+, [xcodegen](https://github.com/yonaskolb/XcodeGen).
 
-The app lives under [`macos/`](macos/); all commands below are run from the
-repo root.
-
 ## Layout
 
 ```
-macos/
+.
 ├── project.yml          # xcodegen manifest — RNapi.xcodeproj is generated
 ├── RNapi/               # app shell: @main, AppDelegate, Info.plist
 ├── RNapiKit/            # all logic, one SPM package with 9 targets
@@ -33,11 +30,11 @@ macos/
 ## Build & test
 
 ```sh
-cd macos/RNapiKit
+cd RNapiKit
 swift build          # everything except the .app
 swift test           # 70+ tests, no network needed
 
-cd ..
+cd ..                # repo root
 xcodegen generate    # creates RNapi.xcodeproj (gitignored)
 xcodebuild -project RNapi.xcodeproj -scheme RNapi build
 ```
@@ -45,13 +42,13 @@ xcodebuild -project RNapi.xcodeproj -scheme RNapi build
 CLI during development:
 
 ```sh
-cd macos/RNapiKit && swift run rnapi-cli -l pl Movie.mkv
+cd RNapiKit && swift run rnapi-cli -l pl Movie.mkv
 ```
 
 ## Release
 
 ```sh
-cd macos
+# from the repo root
 CODE_SIGN_IDENTITY="Developer ID Application: ..." scripts/build-release.sh
 scripts/notarize.sh build/RNapi.app
 ```
