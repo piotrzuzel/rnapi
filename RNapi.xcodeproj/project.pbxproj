@@ -8,11 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		69D4197082E97F59AB3F19ED /* RNapiUI in Frameworks */ = {isa = PBXBuildFile; productRef = 68D53F14E49C90FEE99D7F5A /* RNapiUI */; };
+		AAAA0002CAFE0002CAFE0002 /* rnapi.icon in Resources */ = {isa = PBXBuildFile; fileRef = AAAA0001CAFE0001CAFE0001 /* rnapi.icon */; };
 		C87514990926F267315D92AC /* RNapiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CEDA65A2AEAE0F2D74D5EB /* RNapiApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		96F5BA743BC14E70B6A35154 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		AAAA0001CAFE0001CAFE0001 /* rnapi.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = rnapi.icon; sourceTree = "<group>"; };
 		98109127C541849BEFD9BC62 /* RNapiKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RNapiKit; path = RNapiKit; sourceTree = SOURCE_ROOT; };
 		A4CEDA65A2AEAE0F2D74D5EB /* RNapiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNapiApp.swift; sourceTree = "<group>"; };
 		D5A25A1AF2917562399133B4 /* RNapi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RNapi.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -33,6 +35,7 @@
 		549064FCFE45D7D493CD0E8A /* RNapi */ = {
 			isa = PBXGroup;
 			children = (
+				AAAA0001CAFE0001CAFE0001 /* rnapi.icon */,
 				96F5BA743BC14E70B6A35154 /* Info.plist */,
 				A4CEDA65A2AEAE0F2D74D5EB /* RNapiApp.swift */,
 			);
@@ -73,6 +76,7 @@
 			buildPhases = (
 				884060E14F9E709862C10CC2 /* Sources */,
 				FED07C7640EFE813C1BD7545 /* Frameworks */,
+				AAAA0003CAFE0003CAFE0003 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -115,6 +119,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AAAA0003CAFE0003CAFE0003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAAA0002CAFE0002CAFE0002 /* rnapi.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		884060E14F9E709862C10CC2 /* Sources */ = {
@@ -195,7 +210,7 @@
 		0D9F8D4C24548BF85456E906 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = rnapi;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -273,7 +288,7 @@
 		E5A1530B88D6D65ABD47D8F3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = rnapi;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;

@@ -1,0 +1,33 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Glyph: subtle top-lit white -->
+    <linearGradient id="ink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#D9E2FF"/>
+    </linearGradient>
+    <!-- Accent for the "active" subtitle line -->
+    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7DEBFF"/>
+      <stop offset="1" stop-color="#4FC8F2"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#0A0D2E" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Transparent background — add your gradient as a separate layer in Icon Composer -->
+
+  <!-- ===== GLYPH — lines of dialogue stacking into a download arrow ===== -->
+  <g id="glyph" filter="url(#softShadow)">
+    <!-- Subtitle line 1 -->
+    <rect x="322" y="218" width="380" height="86" rx="43" fill="url(#ink)"/>
+    <!-- Subtitle line 2 — the "active" line, accented -->
+    <rect x="372" y="344" width="280" height="86" rx="43" fill="url(#accent)"/>
+    <!-- Subtitle line 3 -->
+    <rect x="342" y="470" width="340" height="86" rx="43" fill="url(#ink)"/>
+    <!-- Arrowhead: the lines resolve into a download -->
+    <path d="M 318 640 L 706 640 L 512 818 Z"
+          fill="url(#ink)" stroke="url(#ink)" stroke-width="64"
+          stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+</svg>
