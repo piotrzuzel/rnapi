@@ -1,12 +1,12 @@
-# RNapi
+# RQNapi
 
-RNapi is an automatic movie-subtitle downloader for macOS — a native Swift 6 +
+RQNapi is an automatic movie-subtitle downloader for macOS — a native Swift 6 +
 SwiftUI rewrite of [QNapi](https://github.com/QNapi/qnapi).
 
 It identifies each video by a content **hash** (not its filename), looks that
 hash up across NapiProjekt, OpenSubtitles and Napisy24, and drops the
 best-matching subtitle right next to the movie. It runs as a menu bar app and
-ships a `rnapi-cli` for the terminal — point it at a single file or a whole
+ships a `rqnapi-cli` for the terminal — point it at a single file or a whole
 folder and it works through them in the background. No account or API key
 required.
 
@@ -16,7 +16,7 @@ required.
   how the file is named.
 - **Three sources** — NapiProjekt, OpenSubtitles and Napisy24, searched in a
   configurable order with a primary and a backup language.
-- **Menu bar app + CLI** — drag-and-drop in the app, or `rnapi-cli` for
+- **Menu bar app + CLI** — drag-and-drop in the app, or `rqnapi-cli` for
   scripting and batch jobs.
 - **Folder scanning** — recursively finds videos and can skip ones that already
   have subtitles.
@@ -31,19 +31,19 @@ Requires macOS 15+. Building requires Xcode 26+.
 
 ```
 .
-├── RNapi.xcodeproj/     # Xcode project (tracked)
-├── RNapi/               # app shell: @main, AppDelegate, Info.plist
-├── RNapiKit/            # all logic, one SPM package with 9 targets
+├── RQNapi.xcodeproj/     # Xcode project (tracked)
+├── RQNapi/               # app shell: @main, AppDelegate, Info.plist
+├── RQNapiKit/            # all logic, one SPM package with 9 targets
 │   └── Sources/
-│       ├── RNapiCore/       # domain models, file hashes, languages, encodings
+│       ├── RQNapiCore/       # domain models, file hashes, languages, encodings
 │       ├── SubtitleFormats/ # SRT/MicroDVD/MPL2/TMPlayer codecs + conversion
 │       ├── MediaInfo/       # frame-rate detection (AVFoundation)
 │       ├── SevenZip/        # 7z extraction (PLzmaSDK, AES support)
 │       ├── Engines/         # service clients behind SubtitleEngine protocol
 │       ├── DownloadPipeline/# orchestration: hash→search→select→download→match
-│       ├── RNapiSettings/   # UserDefaults config + Keychain credentials
-│       ├── RNapiUI/         # SwiftUI scenes and observable session models
-│       └── rnapi-cli/       # command-line interface
+│       ├── RQNapiSettings/   # UserDefaults config + Keychain credentials
+│       ├── RQNapiUI/         # SwiftUI scenes and observable session models
+│       └── rqnapi-cli/       # command-line interface
 ├── Vendor/PLzmaSDK/     # vendored (SwiftPM forbids unsafe flags in remote deps)
 └── scripts/             # release build + notarization
 ```
@@ -51,18 +51,18 @@ Requires macOS 15+. Building requires Xcode 26+.
 ## Build & test
 
 ```sh
-cd RNapiKit
+cd RQNapiKit
 swift build          # everything except the .app
 swift test           # 70+ tests, no network needed
 
 cd ..                # repo root
-xcodebuild -project RNapi.xcodeproj -scheme RNapi build
+xcodebuild -project RQNapi.xcodeproj -scheme RQNapi build
 ```
 
 CLI during development:
 
 ```sh
-cd RNapiKit && swift run rnapi-cli -l pl Movie.mkv
+cd RQNapiKit && swift run rqnapi-cli -l pl Movie.mkv
 ```
 
 ## Release
@@ -70,10 +70,10 @@ cd RNapiKit && swift run rnapi-cli -l pl Movie.mkv
 ```sh
 # from the repo root
 CODE_SIGN_IDENTITY="Developer ID Application: ..." scripts/build-release.sh
-scripts/notarize.sh build/RNapi.app
+scripts/notarize.sh build/RQNapi.app
 ```
 
-The CLI ships inside the bundle at `RNapi.app/Contents/Helpers/rnapi-cli`;
+The CLI ships inside the bundle at `RQNapi.app/Contents/Helpers/rqnapi-cli`;
 symlink it into your `PATH`.
 
 ## Subtitle engines
@@ -103,7 +103,7 @@ engines"); this is configurable in Settings.
 
 ## Origin & license
 
-RNapi is a ground-up Swift 6 + SwiftUI rewrite of
+RQNapi is a ground-up Swift 6 + SwiftUI rewrite of
 [QNapi](https://github.com/QNapi/qnapi) — the long-running C++/Qt subtitle
 downloader for Windows, macOS and Linux. It reuses QNapi's service behavior and
 file-hashing logic (including NapiProjekt's `npFDigest` and the OpenSubtitles
