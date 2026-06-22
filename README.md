@@ -1,10 +1,31 @@
 # RNapi
 
-RNapi — native macOS rewrite of [QNapi](https://github.com/QNapi/qnapi) in
-Swift 6 + SwiftUI. A menu bar app and CLI that download movie subtitles from
-NapiProjekt, OpenSubtitles and Napisy24.
+RNapi is an automatic movie-subtitle downloader for macOS — a native Swift 6 +
+SwiftUI rewrite of [QNapi](https://github.com/QNapi/qnapi).
 
-Requires macOS 15+, Xcode 26+.
+It identifies each video by a content **hash** (not its filename), looks that
+hash up across NapiProjekt, OpenSubtitles and Napisy24, and drops the
+best-matching subtitle right next to the movie. It runs as a menu bar app and
+ships a `rnapi-cli` for the terminal — point it at a single file or a whole
+folder and it works through them in the background. No account or API key
+required.
+
+## Features
+
+- **Hash-based matching** — finds subtitles for the exact release, regardless of
+  how the file is named.
+- **Three sources** — NapiProjekt, OpenSubtitles and Napisy24, searched in a
+  configurable order with a primary and a backup language.
+- **Menu bar app + CLI** — drag-and-drop in the app, or `rnapi-cli` for
+  scripting and batch jobs.
+- **Folder scanning** — recursively finds videos and can skip ones that already
+  have subtitles.
+- **Post-processing** — optional conversion between SubRip / MicroDVD / MPL2 /
+  TMPlayer and subtitle text-encoding normalization.
+- **Native & self-contained** — Swift 6 / SwiftUI, works out of the box with no
+  required API keys.
+
+Requires macOS 15+. Building requires Xcode 26+.
 
 ## Layout
 
@@ -79,3 +100,13 @@ engines"); this is configurable in Settings.
   adapt if sandboxing is ever needed.
 - Plain-HTTP exceptions for napiprojekt.pl and napisy24.pl live in the app's
   Info.plist (`NSAppTransportSecurity`); both services are HTTP-only.
+
+## Origin & license
+
+RNapi is a ground-up Swift 6 + SwiftUI rewrite of
+[QNapi](https://github.com/QNapi/qnapi) — the long-running C++/Qt subtitle
+downloader for Windows, macOS and Linux. It reuses QNapi's service behavior and
+file-hashing logic (including NapiProjekt's `npFDigest` and the OpenSubtitles
+hash). Thanks to the QNapi authors and contributors for the original project.
+
+Licensed under **GPL-2.0**, inherited from QNapi.
