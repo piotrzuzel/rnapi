@@ -21,92 +21,116 @@ public struct ScanView: View {
     public init() {}
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            directoryRow
-            optionsRows
-            resultsList
-            bottomBar
-        }
-        .padding(20)
-        .frame(minWidth: 540, minHeight: 420)
-        .onAppear(perform: loadDefaults)
-    }
+        Form {
+            Section("Source") {
+                LabeledContent("Directory") {
+                    HStack(spacing: 6) {
+                        Image(systemName: "folder")
+                            .foregroundStyle(.secondary)
+                        Text(directory?.path ?? String(localized: "None selected"))
+                            .foregroundStyle(directory == nil ? .secondary : .primary)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        Spacer(minLength: 8)
+                        Button("Choose…") { chooseDirectory() }
+                    }
+                }
 
-    private var directoryRow: some View {
-        HStack {
-            Text("Directory:")
-            Text(directory?.path ?? String(localized: "None selected"))
-                .foregroundStyle(directory == nil ? .secondary : .primary)
-                .lineLimit(1)
-                .truncationMode(.middle)
-            Spacer()
-            Button("Choose…") { chooseDirectory() }
-        }
-    }
+                VStack(alignment: .leading, spacing: 4) {
+                    TextField(
+                        "File types", text: $filtersText,
+                        prompt: Text("mkv avi mp4 …"))
+                    Text("Space-separated file extensions to include.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
 
-    private var optionsRows: some View {
-        Group {
-            TextField(
-                "File types:", text: $filtersText,
-                prompt: Text("space-separated extensions, e.g. mkv avi mp4"))
-            HStack(spacing: 16) {
+            Section("Options") {
                 Toggle("Skip movies with existing subtitles", isOn: $skipIfSubtitlesExist)
                 Toggle("Follow symbolic links", isOn: $followSymlinks)
             }
-        }
-    }
 
-    private var resultsList: some View {
-        Group {
-            if isScanning {
-                HStack {
-                    ProgressView().controlSize(.small)
-                    Text("Scanning…")
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if foundMovies.isEmpty {
-                ContentUnavailableView {
-                    Label(
-                        hasScanned ? "No Movies Found" : "No Scan Yet",
-                        systemImage: "film.stack")
-                } description: {
-                    Text(
-                        hasScanned
-                            ? "No matching video files in the chosen directory."
-                            : "Choose a directory and click Scan.")
-                }
-            } else {
-                List(foundMovies, id: \.self) { movie in
-                    Toggle(isOn: binding(for: movie)) {
-                        Text(relativePath(of: movie))
-                            .lineLimit(1)
-                            .truncationMode(.middle)
+            Section {
+                resultsContent
+            } header: {
+                HStack(spacing: 8) {
+                    Text("Movies")
+                    Spacer()
+                    if !foundMovies.isEmpty {
+                        Text("\(foundMovies.count) found · \(selected.count) selected")
+                            .foregroundStyle(.secondary)
+                        Menu("Select") {
+                            Button("All") { selected = Set(foundMovies) }
+                            Button("None") { selected = [] }
+                            Button("Invert") {
+                                selected = Set(foundMovies).symmetricDifference(selected)
+                            }
+                        }
+                        .menuStyle(.borderlessButton)
+                        .fixedSize()
                     }
                 }
-                .frame(minHeight: 160)
+            }
+        }
+        .formStyle(.grouped)
+        .frame(minWidth: 540, minHeight: 460)
+        .safeAreaInset(edge: .bottom) { bottomBar }
+        .onAppear(perform: loadDefaults)
+    }
+
+    @ViewBuilder
+    private var resultsContent: some View {
+        if isScanning {
+            HStack(spacing: 8) {
+                ProgressView().controlSize(.small)
+                Text("Scanning…").foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.vertical, 24)
+        } else if foundMovies.isEmpty {
+            ContentUnavailableView {
+                Label(
+                    hasScanned ? "No Movies Found" : "No Scan Yet",
+                    systemImage: "film.stack")
+            } description: {
+                Text(
+                    hasScanned
+                        ? "No matching video files in the chosen directory."
+                        : "Choose a directory and click Scan.")
+            }
+            .frame(maxWidth: .infinity)
+        } else {
+            ForEach(foundMovies, id: \.self) { movie in
+                Toggle(isOn: binding(for: movie)) {
+                    Label(relativePath(of: movie), systemImage: "film")
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
             }
         }
     }
 
     private var bottomBar: some View {
-        HStack {
-            Button("Select All") { selected = Set(foundMovies) }
-                .disabled(foundMovies.isEmpty)
-            Button("Select None") { selected = [] }
-                .disabled(foundMovies.isEmpty)
-            Button("Invert") { selected = Set(foundMovies).symmetricDifference(selected) }
-                .disabled(foundMovies.isEmpty)
-            Spacer()
-            Button("Scan") { scan() }
-                .disabled(directory == nil || isScanning)
-            Button("Download Subtitles") {
-                session.enqueue(foundMovies.filter(selected.contains))
-                openWindow(id: RQNapiScenes.WindowID.downloads)
-                NSApp.activate()
+        VStack(spacing: 0) {
+            Divider()
+            HStack {
+                Spacer()
+                Button("Scan", systemImage: "magnifyingglass") { scan() }
+                    .disabled(directory == nil || isScanning)
+                Button("Download Subtitles") {
+                    session.enqueue(foundMovies.filter(selected.contains))
+                    openWindow(id: RQNapiScenes.WindowID.downloads)
+                    NSApp.activate()
+                }
+                .buttonStyle(.borderedProminent)
+                .keyboardShortcut(.defaultAction)
+                .disabled(selected.isEmpty)
             }
-            .keyboardShortcut(.defaultAction)
-            .disabled(selected.isEmpty)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
         }
+        .background(.bar)
     }
 
     // MARK: - Actions
