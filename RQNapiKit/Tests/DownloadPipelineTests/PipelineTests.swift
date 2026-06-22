@@ -242,33 +242,41 @@ private func collectEvents(
         #expect(try String(contentsOf: target, encoding: .utf8) == "subtitle-content")
     }
 
-    @Test func backsUpExistingSubtitleAsCopy() throws {
+    @Test func replacesExistingSubtitleWithoutLeavingACopy() throws {
         let (movie, subtitle, dir) = try makeFiles()
         defer { try? FileManager.default.removeItem(at: dir) }
 
         let existing = dir.appendingPathComponent("Film.srt")
         try Data("old".utf8).write(to: existing)
 
-        try SubtitleMatcher(configuration: .init(noBackup: false))
+        try SubtitleMatcher(configuration: .init())
             .match(subtitle: subtitle, movie: movie)
 
-        let backup = dir.appendingPathComponent("Film_copy.srt")
-        #expect(try String(contentsOf: backup, encoding: .utf8) == "old")
+        #expect(!FileManager.default.fileExists(
+            atPath: dir.appendingPathComponent("Film_copy.srt").path))
         #expect(try String(contentsOf: existing, encoding: .utf8) == "subtitle-content")
     }
 
-    @Test func noBackupOverwritesExisting() throws {
+    @Test func leavesOnlyOneSubtitleClearingOtherExtensionsAndLegacyCopies() throws {
         let (movie, subtitle, dir) = try makeFiles()
         defer { try? FileManager.default.removeItem(at: dir) }
 
-        let existing = dir.appendingPathComponent("Film.srt")
-        try Data("old".utf8).write(to: existing)
+        // Leftovers from earlier runs: a different extension and a _copy backup.
+        for name in ["Film.txt", "Film.sub", "Film_copy.srt"] {
+            try Data("old".utf8).write(to: dir.appendingPathComponent(name))
+        }
 
-        try SubtitleMatcher(configuration: .init(noBackup: true))
+        let target = try SubtitleMatcher(configuration: .init())
             .match(subtitle: subtitle, movie: movie)
 
-        #expect(!FileManager.default.fileExists(atPath: dir.appendingPathComponent("Film_copy.srt").path))
-        #expect(try String(contentsOf: existing, encoding: .utf8) == "subtitle-content")
+        let remaining = try FileManager.default.contentsOfDirectory(atPath: dir.path)
+            .filter { name in
+                name.hasPrefix("Film")
+                    && ["srt", "sub", "txt"].contains((name as NSString).pathExtension)
+            }
+            .sorted()
+        #expect(remaining == ["Film.srt"])
+        #expect(target.lastPathComponent == "Film.srt")
     }
 
     @Test func postProcessingFormatDrivesExtension() throws {

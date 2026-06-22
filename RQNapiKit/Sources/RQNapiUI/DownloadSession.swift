@@ -133,7 +133,6 @@ public final class DownloadSession {
                 backupLanguage: configuration.backupLanguageCode.flatMap(SubtitleLanguage.init),
                 searchPolicy: configuration.searchPolicy,
                 downloadPolicy: downloadPolicy,
-                noBackup: configuration.noBackup,
                 postProcessing: configuration.postProcessing,
                 changePermissionsTo: configuration.changePermissionsTo))
     }

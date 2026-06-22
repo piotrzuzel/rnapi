@@ -70,7 +70,6 @@ private struct GeneralSettingsTab: View {
 
             Divider()
 
-            Toggle("Back up existing subtitles", isOn: binding(\.noBackup, inverted: true))
             Toggle("Show Dock icon", isOn: binding(\.showDockIcon))
 
             Divider()
