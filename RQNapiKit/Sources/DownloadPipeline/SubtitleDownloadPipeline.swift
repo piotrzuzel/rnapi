@@ -8,7 +8,6 @@ public struct PipelineConfiguration: Sendable {
     public var backupLanguage: SubtitleLanguage?
     public var searchPolicy: SearchPolicy
     public var downloadPolicy: DownloadPolicy
-    public var noBackup: Bool
     public var postProcessing: PostProcessingSettings
     public var changePermissionsTo: String?
     public var temporaryDirectory: URL
@@ -19,7 +18,6 @@ public struct PipelineConfiguration: Sendable {
         backupLanguage: SubtitleLanguage? = nil,
         searchPolicy: SearchPolicy = .searchAll,
         downloadPolicy: DownloadPolicy = .showListIfNeeded,
-        noBackup: Bool = false,
         postProcessing: PostProcessingSettings = PostProcessingSettings(),
         changePermissionsTo: String? = nil,
         temporaryDirectory: URL = FileManager.default.temporaryDirectory,
@@ -29,7 +27,6 @@ public struct PipelineConfiguration: Sendable {
         self.backupLanguage = backupLanguage
         self.searchPolicy = searchPolicy
         self.downloadPolicy = downloadPolicy
-        self.noBackup = noBackup
         self.postProcessing = postProcessing
         self.changePermissionsTo = changePermissionsTo
         self.temporaryDirectory = temporaryDirectory
@@ -146,7 +143,6 @@ public struct SubtitleDownloadPipeline: Sendable {
 
         let matcher = SubtitleMatcher(
             configuration: SubtitleMatcher.Configuration(
-                noBackup: configuration.noBackup,
                 postProcessingEnabled: configuration.postProcessing.enabled,
                 targetFormatName: configuration.postProcessing.targetFormatName,
                 targetExtension: configuration.postProcessing.targetExtension,

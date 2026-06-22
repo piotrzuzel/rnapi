@@ -29,7 +29,6 @@ public struct AppConfiguration: Sendable, Codable, Hashable {
     public var backupLanguageCode: String?
     public var searchPolicy: SearchPolicy
     public var downloadPolicy: DownloadPolicy
-    public var noBackup: Bool
     public var quietBatch: Bool
     public var engineOrder: [String]
     public var enabledEngines: Set<String>
@@ -44,7 +43,6 @@ public struct AppConfiguration: Sendable, Codable, Hashable {
         backupLanguageCode: String? = "en",
         searchPolicy: SearchPolicy = .searchAll,
         downloadPolicy: DownloadPolicy = .showListIfNeeded,
-        noBackup: Bool = false,
         quietBatch: Bool = false,
         engineOrder: [String] = ["NapiProjekt", "OpenSubtitles", "Napisy24"],
         enabledEngines: Set<String> = ["NapiProjekt", "OpenSubtitles", "Napisy24"],
@@ -58,7 +56,6 @@ public struct AppConfiguration: Sendable, Codable, Hashable {
         self.backupLanguageCode = backupLanguageCode
         self.searchPolicy = searchPolicy
         self.downloadPolicy = downloadPolicy
-        self.noBackup = noBackup
         self.quietBatch = quietBatch
         self.engineOrder = engineOrder
         self.enabledEngines = enabledEngines

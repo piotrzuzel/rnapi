@@ -101,7 +101,6 @@ struct RQNapiCLI: AsyncParsableCommand {
             backupLanguage: stored.backupLanguageCode.flatMap(SubtitleLanguage.init),
             searchPolicy: stored.searchPolicy,
             downloadPolicy: stored.downloadPolicy,
-            noBackup: stored.noBackup,
             postProcessing: stored.postProcessing,
             changePermissionsTo: stored.changePermissionsTo)
 
