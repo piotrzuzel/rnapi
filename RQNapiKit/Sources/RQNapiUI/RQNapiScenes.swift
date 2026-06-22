@@ -1,8 +1,5 @@
-import AppKit
-import DownloadPipeline
 import RQNapiSettings
 import SwiftUI
-import UniformTypeIdentifiers
 
 /// All app scenes, bundled so the app target stays a thin shell. The app
 /// creates the shared model objects and passes them in.
@@ -16,12 +13,7 @@ public struct RQNapiScenes: Scene {
     }
 
     public var body: some Scene {
-        MenuBarExtra("RQNapi", systemImage: "captions.bubble") {
-            MenuBarContent()
-                .environment(settings)
-                .environment(session)
-        }
-
+        // First scene → the main window shown at launch.
         Window("RQNapi Downloads", id: WindowID.downloads) {
             DownloadQueueView()
                 .environment(settings)
@@ -52,72 +44,4 @@ public struct RQNapiScenes: Scene {
         public static let scan = "scan"
         public static let converter = "converter"
     }
-}
-
-private struct MenuBarContent: View {
-    @Environment(DownloadSession.self) private var session
-    @Environment(\.openWindow) private var openWindow
-    @Environment(\.openSettings) private var openSettings
-
-    var body: some View {
-        Button("Download Subtitles…") {
-            openWindow(id: RQNapiScenes.WindowID.downloads)
-            NSApp.activate()
-            addMovies()
-        }
-
-        Button("Scan Directories…") {
-            openWindow(id: RQNapiScenes.WindowID.scan)
-            NSApp.activate()
-        }
-
-        Button("Convert Subtitles…") {
-            openWindow(id: RQNapiScenes.WindowID.converter)
-            NSApp.activate()
-        }
-
-        Divider()
-
-        Button("Show Downloads") {
-            openWindow(id: RQNapiScenes.WindowID.downloads)
-            NSApp.activate()
-        }
-
-        Divider()
-
-        Button("Settings…") {
-            openSettings()
-            NSApp.activate()
-        }
-
-        Button("About RQNapi") {
-            NSApp.activate()
-            NSApp.orderFrontStandardAboutPanel(options: [
-                .applicationName: "RQNapi",
-                .credits: NSAttributedString(
-                    string: String(
-                        localized: "Subtitle downloader for macOS.\nEngines: NapiProjekt, OpenSubtitles, Napisy24."
-                    ))
-            ])
-        }
-
-        Divider()
-
-        Button("Quit RQNapi") {
-            NSApp.terminate(nil)
-        }
-        .keyboardShortcut("q")
-    }
-
-    private func addMovies() {
-        let panel = NSOpenPanel()
-        panel.allowsMultipleSelection = true
-        panel.allowedContentTypes = [.movie, .video]
-        panel.allowsOtherFileTypes = true
-        panel.message = String(localized: "Choose video files to download subtitles for")
-        if panel.runModal() == .OK {
-            session.enqueue(panel.urls)
-        }
-    }
-
 }

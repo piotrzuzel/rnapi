@@ -70,10 +70,6 @@ private struct GeneralSettingsTab: View {
 
             Divider()
 
-            Toggle("Show Dock icon", isOn: binding(\.showDockIcon))
-
-            Divider()
-
             Toggle(
                 "Change subtitle file permissions to:",
                 isOn: Binding(

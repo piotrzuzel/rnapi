@@ -27,7 +27,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        applyDockIconPolicy()
+        // Regular windowed app: Dock icon + standard menu bar, no tray.
+        NSApp.setActivationPolicy(.regular)
     }
 
     /// "Open with RQNapi" from Finder. Files arriving right after launch run
@@ -48,10 +49,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        false
-    }
-
-    private func applyDockIconPolicy() {
-        NSApp.setActivationPolicy(settings.configuration.showDockIcon ? .regular : .accessory)
+        true
     }
 }
