@@ -6,6 +6,8 @@ import UniformTypeIdentifiers
 /// video files.
 public struct DownloadQueueView: View {
     @Environment(DownloadSession.self) private var session
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.openSettings) private var openSettings
 
     public init() {}
 
@@ -21,16 +23,25 @@ public struct DownloadQueueView: View {
         }
         .frame(minWidth: 480, minHeight: 280)
         .toolbar {
-            ToolbarItem {
+            ToolbarItemGroup {
                 Button("Add Movies…", systemImage: "plus") {
                     addMovies()
                 }
+                Button("Scan Directories…", systemImage: "folder.badge.gearshape") {
+                    openWindow(id: RQNapiScenes.WindowID.scan)
+                }
+                Button("Convert Subtitles…", systemImage: "arrow.triangle.2.circlepath") {
+                    openWindow(id: RQNapiScenes.WindowID.converter)
+                }
             }
-            ToolbarItem {
+            ToolbarItemGroup {
                 Button("Clear Finished", systemImage: "trash") {
                     session.clearFinished()
                 }
                 .disabled(!session.items.contains(where: \.state.isFinished))
+                Button("Settings…", systemImage: "gearshape") {
+                    openSettings()
+                }
             }
         }
         .dropDestination(for: URL.self) { urls, _ in

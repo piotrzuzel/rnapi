@@ -36,7 +36,6 @@ public struct AppConfiguration: Sendable, Codable, Hashable {
     public var postProcessing: PostProcessingSettings
     public var changePermissionsTo: String?
     public var scan: ScanSettings
-    public var showDockIcon: Bool
 
     public init(
         languageCode: String = "pl",
@@ -49,8 +48,7 @@ public struct AppConfiguration: Sendable, Codable, Hashable {
         openSubtitlesApiKey: String? = nil,
         postProcessing: PostProcessingSettings = PostProcessingSettings(),
         changePermissionsTo: String? = nil,
-        scan: ScanSettings = ScanSettings(),
-        showDockIcon: Bool = true
+        scan: ScanSettings = ScanSettings()
     ) {
         self.languageCode = languageCode
         self.backupLanguageCode = backupLanguageCode
@@ -63,7 +61,6 @@ public struct AppConfiguration: Sendable, Codable, Hashable {
         self.postProcessing = postProcessing
         self.changePermissionsTo = changePermissionsTo
         self.scan = scan
-        self.showDockIcon = showDockIcon
     }
 }
 
