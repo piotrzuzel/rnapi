@@ -84,7 +84,9 @@ public struct ConverterView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(minWidth: 460, minHeight: 380)
+        // Fixed height so the grouped Form doesn't stretch the window
+        // vertically into empty space; width stays flexible.
+        .frame(minWidth: 460, idealWidth: 480, maxWidth: 640, minHeight: 430, maxHeight: 430)
     }
 
     private func chooseSource() {

@@ -31,7 +31,7 @@ public struct RQNapiScenes: Scene {
         Window("Convert Subtitles", id: WindowID.converter) {
             ConverterView()
         }
-        .defaultSize(width: 480, height: 420)
+        .windowResizability(.contentSize)
 
         Settings {
             RQNapiSettingsView()
