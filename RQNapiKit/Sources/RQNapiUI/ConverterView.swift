@@ -29,7 +29,10 @@ public struct ConverterView: View {
                     Button("Choose…") { chooseSource() }
                 }
                 if let detectedFormat {
-                    LabeledContent("Detected format:", value: detectedFormat)
+                    LabeledContent("Detected format:") {
+                        Text(detectedFormat)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
 
@@ -81,7 +84,9 @@ public struct ConverterView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(minWidth: 460, minHeight: 380)
+        // Fixed height so the grouped Form doesn't stretch the window
+        // vertically into empty space; width stays flexible.
+        .frame(minWidth: 460, idealWidth: 480, maxWidth: 640, minHeight: 430, maxHeight: 430)
     }
 
     private func chooseSource() {
@@ -95,7 +100,7 @@ public struct ConverterView: View {
             if let data = try? Data(contentsOf: url),
                let text = String(data: data, encoding: TextEncodingDetector.detectEncoding(of: data))
             {
-                let lines = text.components(separatedBy: .newlines)
+                let lines = Self.subtitleLines(from: text)
                 detectedFormat = SubtitleFormatsRegistry.detectFormat(lines: lines)?.name
                     ?? String(localized: "unknown")
             }
@@ -135,7 +140,7 @@ public struct ConverterView: View {
 
             let rate = frameRate
             let converted = try SubtitleConverter().convert(
-                lines: text.components(separatedBy: .newlines),
+                lines: Self.subtitleLines(from: text),
                 to: targetFormat,
                 frameRate: { rate })
 
@@ -157,5 +162,18 @@ public struct ConverterView: View {
     private func report(error: String) {
         statusIsError = true
         statusMessage = error
+    }
+
+    /// Splits decoded subtitle text into lines, normalizing CRLF/CR endings
+    /// and stripping a leading BOM. Splitting on `CharacterSet.newlines`
+    /// breaks on CRLF (it inserts an empty line between `\r` and `\n`), which
+    /// made CRLF files — e.g. NapiProjekt downloads — detect as "unknown".
+    private static func subtitleLines(from text: String) -> [String] {
+        var text = text
+        if text.first == "\u{FEFF}" { text.removeFirst() }
+        return text
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+            .components(separatedBy: "\n")
     }
 }
