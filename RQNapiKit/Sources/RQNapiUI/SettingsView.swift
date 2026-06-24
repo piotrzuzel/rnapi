@@ -15,7 +15,7 @@ public struct RQNapiSettingsView: View {
             PostProcessingSettingsTab()
                 .tabItem { Label("Processing", systemImage: "wand.and.stars") }
         }
-        .frame(width: 540)
+        .frame(width: 580)
         .padding(.bottom, 8)
     }
 }
@@ -29,71 +29,73 @@ private struct GeneralSettingsTab: View {
         let configuration = settings.configuration
 
         Form {
-            Picker(
-                "Subtitle language:",
-                selection: binding(\.languageCode)
-            ) {
-                ForEach(SubtitleLanguage.all, id: \.twoLetter) { language in
-                    Text(language.englishName).tag(language.twoLetter)
+            Section("Languages") {
+                Picker(
+                    "Subtitle language:",
+                    selection: binding(\.languageCode)
+                ) {
+                    ForEach(SubtitleLanguage.all, id: \.twoLetter) { language in
+                        Text(language.englishName).tag(language.twoLetter)
+                    }
                 }
-            }
 
-            Picker(
-                "Backup language:",
-                selection: Binding(
-                    get: { configuration.backupLanguageCode ?? "" },
-                    set: { newValue in
-                        settings.update { $0.backupLanguageCode = newValue.isEmpty ? nil : newValue }
-                    })
-            ) {
-                Text("None").tag("")
-                ForEach(SubtitleLanguage.all, id: \.twoLetter) { language in
-                    Text(language.englishName).tag(language.twoLetter)
-                }
-            }
-
-            Divider()
-
-            Picker("Search mode:", selection: binding(\.searchPolicy)) {
-                Text("Stop at first engine with results").tag(SearchPolicy.breakIfFound)
-                Text("Search all engines").tag(SearchPolicy.searchAll)
-                Text("Search all engines, both languages").tag(SearchPolicy.searchAllWithBackupLanguage)
-            }
-            .pickerStyle(.radioGroup)
-
-            Picker("Subtitle list:", selection: binding(\.downloadPolicy)) {
-                Text("Always show").tag(DownloadPolicy.alwaysShowList)
-                Text("Show when match is uncertain").tag(DownloadPolicy.showListIfNeeded)
-                Text("Never show (pick best)").tag(DownloadPolicy.neverShowList)
-            }
-            .pickerStyle(.radioGroup)
-
-            Divider()
-
-            Toggle(
-                "Change subtitle file permissions to:",
-                isOn: Binding(
-                    get: { configuration.changePermissionsTo != nil },
-                    set: { enabled in
-                        settings.update { $0.changePermissionsTo = enabled ? "644" : nil }
-                    }))
-            if configuration.changePermissionsTo != nil {
-                TextField(
-                    "Permissions (octal):",
-                    text: Binding(
-                        get: { configuration.changePermissionsTo ?? "644" },
+                Picker(
+                    "Backup language:",
+                    selection: Binding(
+                        get: { configuration.backupLanguageCode ?? "" },
                         set: { newValue in
-                            let octal = newValue.filter("01234567".contains).prefix(3)
-                            settings.update { $0.changePermissionsTo = String(octal) }
-                        }))
-                .frame(width: 220)
+                            settings.update { $0.backupLanguageCode = newValue.isEmpty ? nil : newValue }
+                        })
+                ) {
+                    Text("None").tag("")
+                    ForEach(SubtitleLanguage.all, id: \.twoLetter) { language in
+                        Text(language.englishName).tag(language.twoLetter)
+                    }
+                }
             }
 
-            Divider()
+            Section("Search") {
+                Picker("Search mode:", selection: binding(\.searchPolicy)) {
+                    Text("Stop at first engine with results").tag(SearchPolicy.breakIfFound)
+                    Text("Search all engines").tag(SearchPolicy.searchAll)
+                    Text("Search all engines, both languages").tag(SearchPolicy.searchAllWithBackupLanguage)
+                }
+                .pickerStyle(.radioGroup)
 
-            CommandLineToolRow()
+                Picker("Subtitle list:", selection: binding(\.downloadPolicy)) {
+                    Text("Always show").tag(DownloadPolicy.alwaysShowList)
+                    Text("Show when match is uncertain").tag(DownloadPolicy.showListIfNeeded)
+                    Text("Never show (pick best)").tag(DownloadPolicy.neverShowList)
+                }
+                .pickerStyle(.radioGroup)
+            }
+
+            Section("Output") {
+                Toggle(
+                    "Change subtitle file permissions to:",
+                    isOn: Binding(
+                        get: { configuration.changePermissionsTo != nil },
+                        set: { enabled in
+                            settings.update { $0.changePermissionsTo = enabled ? "644" : nil }
+                        }))
+                if configuration.changePermissionsTo != nil {
+                    TextField(
+                        "Permissions (octal):",
+                        text: Binding(
+                            get: { configuration.changePermissionsTo ?? "644" },
+                            set: { newValue in
+                                let octal = newValue.filter("01234567".contains).prefix(3)
+                                settings.update { $0.changePermissionsTo = String(octal) }
+                            }))
+                    .frame(width: 220)
+                }
+            }
+
+            Section {
+                CommandLineToolRow()
+            }
         }
-        .padding(20)
+        .formStyle(.grouped)
     }
 
     private func binding<Value>(_ keyPath: WritableKeyPath<AppConfiguration, Value>) -> Binding<Value> {
@@ -157,41 +159,38 @@ private struct EnginesSettingsTab: View {
 
         Form {
             Section {
-                List {
-                    ForEach(configuration.engineOrder, id: \.self) { engineID in
-                        HStack {
-                            Toggle(
-                                "",
-                                isOn: Binding(
-                                    get: { configuration.enabledEngines.contains(engineID) },
-                                    set: { enabled in
-                                        settings.update {
-                                            if enabled {
-                                                $0.enabledEngines.insert(engineID)
-                                            } else {
-                                                $0.enabledEngines.remove(engineID)
-                                            }
+                ForEach(configuration.engineOrder, id: \.self) { engineID in
+                    HStack {
+                        Toggle(
+                            "",
+                            isOn: Binding(
+                                get: { configuration.enabledEngines.contains(engineID) },
+                                set: { enabled in
+                                    settings.update {
+                                        if enabled {
+                                            $0.enabledEngines.insert(engineID)
+                                        } else {
+                                            $0.enabledEngines.remove(engineID)
                                         }
-                                    }))
-                            .labelsHidden()
-                            Text(engineID)
-                            Spacer()
-                            Button("Account…") { editingEngine = engineID }
-                                .buttonStyle(.link)
-                        }
-                    }
-                    .onMove { source, destination in
-                        settings.update { $0.engineOrder.move(fromOffsets: source, toOffset: destination) }
+                                    }
+                                }))
+                        .labelsHidden()
+                        Text(engineID)
+                        Spacer()
+                        Button("Account…") { editingEngine = engineID }
+                            .buttonStyle(.link)
                     }
                 }
-                .frame(minHeight: 120)
+                .onMove { source, destination in
+                    settings.update { $0.engineOrder.move(fromOffsets: source, toOffset: destination) }
+                }
             } header: {
                 Text("Engines are searched in this order (drag to reorder):")
             }
 
-            Section {
+            Section("OpenSubtitles") {
                 TextField(
-                    "OpenSubtitles API key:",
+                    "API key:",
                     text: Binding(
                         get: { configuration.openSubtitlesApiKey ?? "" },
                         set: { newValue in
@@ -202,9 +201,11 @@ private struct EnginesSettingsTab: View {
                 Text("Required for OpenSubtitles. Create one for free at opensubtitles.com → API consumers.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(20)
+        .formStyle(.grouped)
         .sheet(item: $editingEngine) { engineID in
             EngineCredentialsSheet(engineID: engineID)
         }
@@ -267,9 +268,11 @@ private struct PostProcessingSettingsTab: View {
         let postProcessing = settings.configuration.postProcessing
 
         Form {
-            Toggle("Enable post-processing", isOn: binding(\.enabled))
+            Section {
+                Toggle("Enable post-processing", isOn: binding(\.enabled))
+            }
 
-            Group {
+            Section {
                 Picker("Character encoding:", selection: binding(\.encodingChangeMethod)) {
                     Text("Keep original").tag(EncodingChangeMethod.original)
                     Text("Convert").tag(EncodingChangeMethod.change)
@@ -317,7 +320,7 @@ private struct PostProcessingSettingsTab: View {
             }
             .disabled(!postProcessing.enabled)
         }
-        .padding(20)
+        .formStyle(.grouped)
     }
 
     private func binding<Value>(
