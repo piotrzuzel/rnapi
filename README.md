@@ -1,4 +1,4 @@
-<p align="center">
+<p align="left">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://gist.githubusercontent.com/piotrzuzel/2b0dee4363caf66bcb54f59871c26b6a/raw/b3b1055d8f747105edd25a28c1bc58a663323854/rqnapi-dark.svg">
     <img src="https://gist.githubusercontent.com/piotrzuzel/ad187a7c7c8358861a4494857addff45/raw/d9352a3259a258de35ef1c65ef35db72738613e1/rqnapi.svg" alt="RQNapi" height="80">
